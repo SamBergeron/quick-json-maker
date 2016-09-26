@@ -20,6 +20,8 @@ class Maker {
 
     write () {
       let writeData = JSON.stringify(this.jsonObj);
+      if(this.outputFile === undefined)
+        this.outputFile = 'results.txt';
       fs.writeFileSync(this.outputFile, writeData);
     }
 
@@ -29,17 +31,26 @@ class Maker {
       line.trim();
 
       // Do we have a double dot in the line?
-      if(line.indexOf(':') !== -1) {
-        this.parseKeyValue(line);
+      let index = line.indexOf(':');
+      if(index !== -1 && index !== line.length - 1) {
+        this.parsePair(line);
       }
+
+
     }
 
-    parseKeyValue (line) {
+    parsePair (line) {
       let index = line.indexOf(':');
-      let key = line.substring(0, index);
-      let value = line.substring(index + 1, line.length);
+      let key = line.substring(0, index).trim();
+      let value = line.substring(index + 1, line.length).trim();
 
-      console.log(key + ' :' + value);
+      if(value === 'true') { value = true; }
+      if(value === 'false') { value = false; }
+      // Not that strict number parsing
+      let num = Number.parseFloat(value);
+      if(!Number.isNaN(num)) { value = num; }
+
+      // console.log(key + ':' + value);
       this.jsonObj[key] = value;
     }
 
