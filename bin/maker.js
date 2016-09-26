@@ -8,6 +8,10 @@ class Maker {
       this.outputFile = output;
       this.data = '';
       this.jsonObj = {};
+
+      this.depth = -1;
+      this.workingObject = this.jsonObj;
+      this.parentObject = null;
     }
 
     read (cb) {
@@ -28,18 +32,42 @@ class Maker {
     parse (line) {
       // Each line we have 3 possibilities key:value key:object key:array
       // Use double dots (:) as a delimiter
-      line.trim();
 
-      // Do we have a double dot in the line?
+      // Following lines will form new object
       let index = line.indexOf(':');
-      if(index !== -1 && index !== line.length - 1) {
-        this.parsePair(line);
+      if(index === line.length - 1) {
+        let newObjKey = this.parseSubObject(line);
+        this.parentObject = this.workingObject;
+        this.workingObject = this.workingObject[newObjKey];
+        this.depth++;
       }
 
+      // Do we have a double dot in the line?
+      else if(index !== -1 && index !== line.length - 1) {
+        console.log(this.parentObject);
+        // Check if line has a tab
+        if(line.lastIndexOf('\t') === this.depth)
+          this.parsePair(line, this.workingObject);
+        else {
+          this.parsePair(line, this.parentObject);
+          this.workingObject = this.parentObject;
+          this.parentObject = null;
+          this.depth--;
+        }
+      }
 
     }
 
-    parsePair (line) {
+    parseSubObject (line) {
+      console.log('Parsing inner-object at line: ' + line);
+      let index = line.indexOf(':');
+      let key = line.substring(0, index).trim();
+      console.log('Object key is: ' + key);
+      this.jsonObj[key] = {};
+      return key;
+    }
+
+    parsePair (line, object) {
       let index = line.indexOf(':');
       let key = line.substring(0, index).trim();
       let value = line.substring(index + 1, line.length).trim();
@@ -51,7 +79,7 @@ class Maker {
       if(!Number.isNaN(num)) { value = num; }
 
       // console.log(key + ':' + value);
-      this.jsonObj[key] = value;
+      object[key] = value;
     }
 
 }
