@@ -1,0 +1,17 @@
+key1 : foo
+key2: String
+key3: true
+key4 : 12345
+key5: 123.241
+key7 :
+	subKey : value
+	subKey1 :
+		subsub: 112
+		subsub2: test
+		triplesub:
+			one: two
+			three: four
+		foo :bar
+	subKey 2: value2
+	subKey3: value3
+key6 : 123nipples
