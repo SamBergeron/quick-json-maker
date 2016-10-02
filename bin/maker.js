@@ -72,8 +72,8 @@ class Maker {
       let value = line.substring(index + 1, line.length).trim();
 
       if(value === 'true') { value = true; }
-      if(value === 'false') { value = false; }
-      if(!isNaN(value)) { value = Number.parseFloat(value); }
+      else if(value === 'false') { value = false; }
+      else if(!isNaN(value)) { value = Number.parseFloat(value); }
 
       object[key] = value;
     }
