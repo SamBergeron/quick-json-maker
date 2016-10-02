@@ -4,10 +4,7 @@ const rl = require('readline');
 
 class JsonNode {
   constructor (data, depth) {
-    if(data !== null)
-      this.data = data;
-    else this.data = null;
-
+    this.data = data;
     this.parentNode = {};
     this.depth = depth;
   }
