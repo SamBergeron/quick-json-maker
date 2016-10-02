@@ -32,7 +32,7 @@ class Maker {
     write () {
       let writeData = JSON.stringify(this.root.data, null, 2);
       if(this.outputFile === undefined)
-        this.outputFile = 'results.txt';
+        this.outputFile = 'results.json';
       fs.writeFileSync(this.outputFile, writeData);
     }
 
