@@ -3,6 +3,7 @@ key2: String
 key3: true
 key4 : 12345
 key5: 123.241
+keylime: 0b0110101
 key7 :
 	subKey : value
 	subKey1 :

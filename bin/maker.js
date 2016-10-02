@@ -17,7 +17,6 @@ class Maker {
     constructor (input, output) {
       this.inputFile = input;
       this.outputFile = output;
-      this.data = '';
       this.root = new JsonNode({}, -1);
       this.workingNode = this.root;
     }
@@ -40,22 +39,24 @@ class Maker {
     parse (line) {
       // Each line we have 3 possibilities key:value key:object key:array
       // Use double dots (:) as a delimiter
-
-      // Following lines will form new object
       let index = line.indexOf(':');
+
+      // : at the end is a new object
       if(index === line.length - 1) {
-        let key = this.parseSubObject(line);
+        let index = line.indexOf(':');
+        let key = line.substring(0, index).trim();
         let tempNode = this.workingNode;
+
         this.workingNode = new JsonNode({}, tempNode.depth + 1)
         this.workingNode.parentNode = tempNode;
         this.workingNode.parentNode.data[key] = this.workingNode.data;
       }
 
-      // Do we have a double dot in the line?
+      // Otherwise we parse a key:value
       else if(index !== -1 && index !== line.length - 1) {
-        console.log(this.workingNode.parentNode.data);
+        // console.log(this.workingNode.parentNode.data);
+        // console.log(line.lastIndexOf('\t') + ' == ' + this.workingNode.depth);
         // Check if line has a tab
-        console.log(line.lastIndexOf('\t') + ' == ' + this.workingNode.depth);
         if(line.lastIndexOf('\t') === this.workingNode.depth)
           this.parsePair(line, this.workingNode.data);
         else {
@@ -63,15 +64,6 @@ class Maker {
           this.workingNode = this.workingNode.parentNode;
         }
       }
-
-    }
-
-    parseSubObject (line) {
-      console.log('Parsing inner-object at line: ' + line);
-      let index = line.indexOf(':');
-      let key = line.substring(0, index).trim();
-      console.log('Object key is: ' + key);
-      return key;
     }
 
     parsePair (line, object) {
@@ -81,11 +73,8 @@ class Maker {
 
       if(value === 'true') { value = true; }
       if(value === 'false') { value = false; }
-      // Not that strict number parsing
-      let num = Number.parseFloat(value);
-      if(!Number.isNaN(num)) { value = num; }
+      if(!isNaN(value)) { value = Number.parseFloat(value); }
 
-      // console.log(key + ':' + value);
       object[key] = value;
     }
 
