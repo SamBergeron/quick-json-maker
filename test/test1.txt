@@ -1,6 +1,18 @@
-key1 : "String"
+key1 : '123'
 key2: String
 key3: true
+key3.5: []
+	foo:bar
+
+	key7 :
+		subKey : value
+		subKey1 : value1
+	
+
+	foo:barometer
+
+	foo: barobar
+	
 key4 : 12345
 key5: 123.241
 key7 :
@@ -8,4 +20,7 @@ key7 :
 	subKey1 : value1
 	subKey 2: value2
 	subKey3: value3
+	sublime:
+		subadub: foo
 key6 : 123nipples
+key9: keylime

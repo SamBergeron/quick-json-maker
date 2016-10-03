@@ -1,7 +1,7 @@
 numero_de_permis: A0001
 cycle: 2014-2016
 heures_transferees_du_cycle_precedent: 2
-activites:
+activites: []
 
 	description: Cours sur la déontologie
 	categorie: cours

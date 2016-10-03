@@ -6,7 +6,9 @@ class JsonNode {
   constructor (data, depth) {
     this.data = data;
     this.parentNode = {};
+    this.parentKey = '';
     this.depth = depth;
+    this.isArray = false;
   }
 }
 
@@ -34,37 +36,52 @@ class Maker {
     }
 
     parse (line) {
-      // Each line we have 3 possibilities key:value key:object key:array
-      // Use double dots (:) as a delimiter
-      let index = line.indexOf(':');
 
-      // : at the end is a new object
-      if(index === line.length - 1) {
+      if (line.trim().length === 0) { // If it's an empty line
+        if(this.workingNode.isArray) {
+          // Push the object into the parent array
+          let pKey = this.workingNode.parentKey;
+          this.workingNode.parentNode.data[pKey].push(this.workingNode.data);
+
+          // Reset the child
+          let temp = this.workingNode;
+          this.workingNode = new JsonNode({}, temp.depth);
+          this.workingNode.isArray = true;
+          this.workingNode.parentNode = temp.parentNode;
+          this.workingNode.parentKey = pKey;
+        }
+      } else {
+        // Use double dots (:) as a delimiter
         let index = line.indexOf(':');
-        let key = line.substring(0, index).trim();
-        let tempNode = this.workingNode;
 
-        this.workingNode = new JsonNode({}, tempNode.depth + 1)
-        this.workingNode.parentNode = tempNode;
-        this.workingNode.parentNode.data[key] = this.workingNode.data;
-      }
+        // : at the end is a new object
+        if(index === line.length - 1 || line.indexOf('[]') === line.length - 2) {
+          let key = line.substring(0, index).trim();
+          let tempNode = this.workingNode;
 
-      // Otherwise we parse a key:value
-      else if(index !== -1 && index !== line.length - 1) {
-        // console.log(this.workingNode.parentNode.data);
-        // console.log(line.lastIndexOf('\t') + ' == ' + this.workingNode.depth);
-        // Check if line has a tab
-        if(line.lastIndexOf('\t') === this.workingNode.depth)
-          this.parsePair(line, this.workingNode.data);
-        else {
-          this.parsePair(line, this.workingNode.parentNode.data);
-          this.workingNode = this.workingNode.parentNode;
+          this.workingNode = new JsonNode({}, tempNode.depth + 1);
+          this.workingNode.parentNode = tempNode;
+          this.workingNode.parentNode.data[key] = this.workingNode.data;
+
+          if(line.indexOf('[]') === line.length - 2) {
+              this.workingNode.isArray = true;
+              this.workingNode.parentKey = key;
+              this.workingNode.parentNode.data[key] = [];
+          }
+
+        } else if (index !== -1) {  // Otherwise we parse a key:value
+          // Check if line has a tab
+          if(line.lastIndexOf('\t') === this.workingNode.depth)
+            this.parsePair(line, this.workingNode.data, index);
+          else {
+            this.parsePair(line, this.workingNode.parentNode.data, index);
+            this.workingNode = this.workingNode.parentNode;
+          }
         }
       }
     }
 
-    parsePair (line, object) {
-      let index = line.indexOf(':');
+    parsePair (line, object, index) {
       let key = line.substring(0, index).trim();
       let value = line.substring(index + 1, line.length).trim();
 
@@ -73,6 +90,7 @@ class Maker {
       else if(!isNaN(value)) { value = Number.parseFloat(value); }
 
       object[key] = value;
+      //console.log(key + ":" + value);
     }
 
 }
