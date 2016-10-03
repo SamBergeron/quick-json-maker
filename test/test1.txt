@@ -7,12 +7,12 @@ key3.5: []
 	key7 :
 		subKey : value
 		subKey1 : value1
-	
+	foo:bar
 
 	foo:barometer
 
 	foo: barobar
-	
+
 key4 : 12345
 key5: 123.241
 key7 :
@@ -22,5 +22,9 @@ key7 :
 	subKey3: value3
 	sublime:
 		subadub: foo
-key6 : 123nipples
+		evenworse:
+			test:123
+			hah:
+				foo:bar
+key6 : ThisOneIsFucked
 key9: keylime

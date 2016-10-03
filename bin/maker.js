@@ -3,12 +3,12 @@ const fs = require('fs');
 const rl = require('readline');
 
 class JsonNode {
-  constructor (data, depth) {
+  constructor (data, depth, parentNode, parentKey, isArray) {
     this.data = data;
-    this.parentNode = {};
-    this.parentKey = '';
     this.depth = depth;
-    this.isArray = false;
+    this.parentNode = parentNode === undefined ? {} : parentNode;
+    this.parentKey = parentKey === undefined ? '' : parentKey;
+    this.isArray = isArray ? true : false;
   }
 }
 
@@ -29,15 +29,15 @@ class Maker {
     }
 
     write () {
-      let writeData = JSON.stringify(this.root.data, null, 2);
+      let writeData = JSON.stringify(this.root.data, null, 4);
       if(this.outputFile === undefined)
         this.outputFile = 'results.json';
       fs.writeFileSync(this.outputFile, writeData);
     }
 
     parse (line) {
-
-      if (line.trim().length === 0) { // If it's an empty line
+      // If it's an empty line
+      if (line.trim().length === 0) {
         if(this.workingNode.isArray) {
           // Push the object into the parent array
           let pKey = this.workingNode.parentKey;
@@ -45,11 +45,10 @@ class Maker {
 
           // Reset the child
           let temp = this.workingNode;
-          this.workingNode = new JsonNode({}, temp.depth);
+          this.workingNode = new JsonNode({}, temp.depth, temp.parentNode, pKey, true);
           this.workingNode.isArray = true;
-          this.workingNode.parentNode = temp.parentNode;
-          this.workingNode.parentKey = pKey;
         }
+      // Every other line
       } else {
         // Use double dots (:) as a delimiter
         let index = line.indexOf(':');
@@ -59,8 +58,7 @@ class Maker {
           let key = line.substring(0, index).trim();
           let tempNode = this.workingNode;
 
-          this.workingNode = new JsonNode({}, tempNode.depth + 1);
-          this.workingNode.parentNode = tempNode;
+          this.workingNode = new JsonNode({}, tempNode.depth + 1, tempNode);
           this.workingNode.parentNode.data[key] = this.workingNode.data;
 
           if(line.indexOf('[]') === line.length - 2) {
@@ -71,12 +69,14 @@ class Maker {
 
         } else if (index !== -1) {  // Otherwise we parse a key:value
           // Check if line has a tab
-          if(line.lastIndexOf('\t') === this.workingNode.depth)
-            this.parsePair(line, this.workingNode.data, index);
-          else {
-            this.parsePair(line, this.workingNode.parentNode.data, index);
-            this.workingNode = this.workingNode.parentNode;
+          if(line.lastIndexOf('\t') !== this.workingNode.depth) {
+            // Back up to the correct depth
+            let depthDiff = this.workingNode.depth - line.lastIndexOf('\t');
+            for (let i=0; i < depthDiff; i++) {
+              this.workingNode = this.workingNode.parentNode;
+            }
           }
+          this.parsePair(line, this.workingNode.data, index);
         }
       }
     }
@@ -90,9 +90,7 @@ class Maker {
       else if(!isNaN(value)) { value = Number.parseFloat(value); }
 
       object[key] = value;
-      //console.log(key + ":" + value);
     }
-
 }
 
 module.exports = Maker;
