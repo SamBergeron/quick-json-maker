@@ -1,0 +1,22 @@
+{
+  "name": "quick-json-maker",
+  "version": "1.0.0",
+  "description": "A fast way to make json files with an easy syntax",
+  "main": "src/app.js",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SamBergeron/quick-json-maker.git"
+  },
+  "author": "Sam Bergeron",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SamBergeron/quick-json-maker/issues"
+  },
+  "homepage": "https://github.com/SamBergeron/quick-json-maker#readme",
+  "devDependencies": {
+    "webpack": "^1.13.2"
+  }
+}
