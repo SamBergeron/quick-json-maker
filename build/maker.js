@@ -1,0 +1,10 @@
+'use strict';const fs=require('fs'),rl=require('readline');class JsonNode{constructor(a,b,c,d,e){this.data=a,this.depth=b,this.parentNode=c===void 0?{}:c,this.parentKey=d===void 0?'':d,this.isArray=!!e}}class Maker{constructor(a,b){this.inputFile=a,this.outputFile=b,this.root=new JsonNode({},-1),this.workingNode=this.root}read(a){let b=rl.createInterface({input:fs.createReadStream(this.inputFile)});b.on('line',c=>{this.parse(c)}),b.on('close',a)}write(){let a=JSON.stringify(this.root.data,null,4);this.outputFile===void 0&&(this.outputFile='results.json'),fs.writeFileSync(this.outputFile,a)}parse(a){// If it's an empty line
+if(!(0===a.trim().length)){// Use double dots (:) as a delimiter
+let b=a.indexOf(':');// : at the end is a new object
+if(b===a.length-1||a.indexOf('[]')===a.length-2){let c=a.substring(0,b).trim(),d=this.workingNode;this.workingNode=new JsonNode({},d.depth+1,d),this.workingNode.parentNode.data[c]=this.workingNode.data,a.indexOf('[]')===a.length-2&&(this.workingNode.isArray=!0,this.workingNode.parentKey=c,this.workingNode.parentNode.data[c]=[])}else if(-1!==b){// Otherwise we parse a key:value
+// Check if line has a tab
+if(a.lastIndexOf('\t')!==this.workingNode.depth){// Back up to the correct depth
+let c=this.workingNode.depth-a.lastIndexOf('\t');for(let d=0;d<c;d++)this.workingNode=this.workingNode.parentNode}this.parsePair(a,this.workingNode.data,b)}}else if(this.workingNode.isArray){// Push the object into the parent array
+let b=this.workingNode.parentKey;this.workingNode.parentNode.data[b].push(this.workingNode.data);// Reset the child
+let c=this.workingNode;this.workingNode=new JsonNode({},c.depth,c.parentNode,b,!0),this.workingNode.isArray=!0}// Every other line
+}parsePair(a,b,c){let d=a.substring(0,c).trim(),e=a.substring(c+1,a.length).trim();'true'===e?e=!0:'false'===e?e=!1:!isNaN(e)&&(e=Number.parseFloat(e)),b[d]=e}}module.exports=Maker;

@@ -17,6 +17,11 @@
   },
   "homepage": "https://github.com/SamBergeron/quick-json-maker#readme",
   "devDependencies": {
-    "webpack": "^1.13.2"
+    "babel-preset-babili": "0.0.5",
+    "del": "^2.2.2",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-concat": "^2.6.0",
+    "gulp-uglify": "^2.0.0"
   }
 }
